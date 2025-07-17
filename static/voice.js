@@ -5,14 +5,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const micBtn = document.getElementById('mic-btn');
     const questionInput = document.getElementById('question-input');
     const ttsBtn = document.getElementById('tts-btn');
+    const micIcon = document.getElementById('mic-icon');
     let recognizing = false;
     let recognition;
+
+    // Null checks for required elements
+    if (!micBtn) console.error('Mic button (mic-btn) not found!');
+    if (!questionInput) console.error('Question input (question-input) not found!');
+    if (!micIcon) console.error('Mic icon (mic-icon) not found!');
 
     // --- Speech Recognition (STT) ---
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
-        recognition.lang = window.language === 'hi' ? 'hi-IN' : 'en-US';
+        // Add Gujarati support
+        let lang = 'en-US';
+        if (window.language === 'hi') lang = 'hi-IN';
+        else if (window.language === 'gu') lang = 'gu-IN';
+        recognition.lang = lang;
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
@@ -21,29 +31,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 recognition.stop();
                 return;
             }
-            recognition.lang = window.language === 'hi' ? 'hi-IN' : 'en-US';
+            // Update language on each click
+            let lang = 'en-US';
+            if (window.language === 'hi') lang = 'hi-IN';
+            else if (window.language === 'gu') lang = 'gu-IN';
+            recognition.lang = lang;
             recognition.start();
         });
 
         recognition.onstart = function() {
             recognizing = true;
-            document.getElementById('mic-icon').textContent = '🔴';
+            if (micIcon) micIcon.textContent = '🔴';
         };
         recognition.onend = function() {
             recognizing = false;
-            document.getElementById('mic-icon').textContent = '🎤';
+            if (micIcon) micIcon.textContent = '🎤';
         };
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
-            questionInput.value = transcript;
+            if (questionInput) questionInput.value = transcript;
+            else console.error('questionInput is null when trying to set value from speech result.');
         };
         recognition.onerror = function(event) {
             recognizing = false;
-            document.getElementById('mic-icon').textContent = '🎤';
-            alert(window.language === 'hi' ? 'माइक काम नहीं कर रहा है।' : 'Mic is not working.');
+            if (micIcon) micIcon.textContent = '🎤';
+            alert((window.language === 'hi' ? 'माइक काम नहीं कर रहा है।' : (window.language === 'gu' ? 'માઇક કામ કરતો નથી.' : 'Mic is not working.')) + '\nError: ' + event.error);
+            console.error('Speech recognition error:', event);
         };
     } else {
         micBtn && (micBtn.disabled = true);
+        console.error('SpeechRecognition API is not supported in this browser.');
     }
 
     // --- Text-to-Speech (TTS) ---
@@ -52,7 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const text = window.answerText || '';
             if (!text) return;
             const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = window.language === 'hi' ? 'hi-IN' : 'en-US';
+            let lang = 'en-US';
+            if (window.language === 'hi') lang = 'hi-IN';
+            else if (window.language === 'gu') lang = 'gu-IN';
+            utter.lang = lang;
             utter.rate = 0.95;
             utter.pitch = 1.1;
             window.speechSynthesis.speak(utter);
