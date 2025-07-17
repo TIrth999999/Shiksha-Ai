@@ -34,7 +34,6 @@
 
 ### 🔐 Login & Language Selection  
 ![Login Page](ss/login.png)
-![Sign Up Page](ss/signup.png)
 
 ### 📚 Courses Dashboard  
 ![Courses Page](ss/course.png)
@@ -45,7 +44,7 @@
 ![Ask AI](ss/ask2.png)
 
 ### 🏆 Achievements & History  
-![Achievements](ss/badges.png)
+![Achievements](ss/badge.png)
 
 ---
 
