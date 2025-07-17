@@ -140,3 +140,6 @@ LANGUAGES = [
 LOCALE_PATHS = [BASE_DIR / 'locale']
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/'
+
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
