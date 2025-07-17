@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let recognizing = false;
     let recognition;
 
-    // Null checks for required elements
+    // Debug: Check for required elements
     if (!micBtn) console.error('Mic button (mic-btn) not found!');
     if (!questionInput) console.error('Question input (question-input) not found!');
     if (!micIcon) console.error('Mic icon (mic-icon) not found!');
@@ -26,18 +26,20 @@ document.addEventListener('DOMContentLoaded', function() {
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        micBtn && micBtn.addEventListener('click', function() {
-            if (recognizing) {
-                recognition.stop();
-                return;
-            }
-            // Update language on each click
-            let lang = 'en-US';
-            if (window.language === 'hi') lang = 'hi-IN';
-            else if (window.language === 'gu') lang = 'gu-IN';
-            recognition.lang = lang;
-            recognition.start();
-        });
+        if (micBtn) {
+            micBtn.addEventListener('click', function() {
+                if (recognizing) {
+                    recognition.stop();
+                    return;
+                }
+                // Update language on each click
+                let lang = 'en-US';
+                if (window.language === 'hi') lang = 'hi-IN';
+                else if (window.language === 'gu') lang = 'gu-IN';
+                recognition.lang = lang;
+                recognition.start();
+            });
+        }
 
         recognition.onstart = function() {
             recognizing = true;
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
             if (questionInput) questionInput.value = transcript;
-            else console.error('questionInput is null when trying to set value from speech result.');
+            else console.error('questionInput is null, cannot set value.');
         };
         recognition.onerror = function(event) {
             recognizing = false;
@@ -59,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Speech recognition error:', event);
         };
     } else {
-        micBtn && (micBtn.disabled = true);
-        console.error('SpeechRecognition API is not supported in this browser.');
+        if (micBtn) micBtn.disabled = true;
+        console.error('SpeechRecognition API not supported in this browser.');
     }
 
     // --- Text-to-Speech (TTS) ---
