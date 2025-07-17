@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if language == 'hi' %}उपलब्धियां{% elif language == 'gu' %}સાધનાઓ{% else %}Achievements{% endif %} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    
+    :root {
+        --primary-color: #3A86FF;
+        --accent-color: #FFBE0B;
+        --success-color: #06D6A0;
+        --text-dark: #2B2D42;
+        --text-light: #8D99AE;
+        --card-shadow: 0 4px 20px rgba(58, 134, 255, 0.1);
+        --card-shadow-hover: 0 8px 30px rgba(58, 134, 255, 0.2);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .achievements-container {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .achievements-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 0 1rem;
+    }
+
+    .achievements-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(58, 134, 255, 0.1);
+    }
+
+    .achievements-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        font-weight: 400;
+        margin-bottom: 2rem;
+    }
+
+    .achievements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        padding: 0 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .achievement-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+        position: relative;
+        border: none;
+        height: 100%;
+    }
+
+    .achievement-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .achievement-card.earned {
+        background: linear-gradient(135deg, var(--success-color) 0%, #04c2a1 100%);
+        color: white;
+    }
+
+    .achievement-card.earned::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 40px solid transparent;
+        border-top: 40px solid var(--accent-color);
+        z-index: 1;
+    }
+
+    .achievement-card.earned::after {
+        content: '✓';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        z-index: 2;
+    }
+
+    .achievement-card.locked {
+        background: #f8f9fa;
+        color: var(--text-light);
+        border: 2px dashed #e9ecef;
+    }
+
+    .card-body {
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+    .achievement-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        transition: var(--transition);
+    }
+
+    .achievement-card.earned .achievement-icon {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .achievement-card.locked .achievement-icon {
+        background: #e9ecef;
+        color: var(--text-light);
+    }
+
+    .achievement-card:hover .achievement-icon {
+        transform: scale(1.1);
+    }
+
+    .achievement-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .achievement-description {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .achievement-badge {
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        transition: var(--transition);
+    }
+
+    .achievement-card.earned .achievement-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .achievement-card.locked .achievement-badge {
+        background: #6c757d;
+        color: white;
+    }
+
+    .no-achievements {
+        text-align: center;
+        padding: 4rem 2rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .no-achievements-icon {
+        font-size: 4rem;
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-achievements-text {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        background: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 2px dashed #e9ecef;
+    }
+
+    .floating-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .floating-star {
+        position: absolute;
+        color: var(--accent-color);
+        animation: float 6s ease-in-out infinite;
+        opacity: 0.6;
+    }
+
+    .floating-star:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .floating-star:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+    .floating-star:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+    .floating-star:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 1s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .achievements-title {
+            font-size: 2rem;
+        }
+        
+        .achievements-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem 1rem;
+        }
+        
+        .achievement-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .achievements-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .achievement-card {
+            margin: 0 0.5rem;
+        }
+    }
+</style>
+
+<div class="achievements-container">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-star">⭐</div>
+        <div class="floating-star">🏆</div>
+        <div class="floating-star">🎯</div>
+        <div class="floating-star">✨</div>
+    </div>
+
+    <div class="container">
+        <div class="achievements-header">
+            <h1 class="achievements-title">
+                <i class="fas fa-trophy" style="color: var(--accent-color); margin-right: 0.5rem;"></i>
+                {% if language == 'hi' %}आपकी उपलब्धियां{% elif language == 'gu' %}તમારી સાધનાઓ{% else %}Your Achievements{% endif %}
+            </h1>
+            <p class="achievements-subtitle">
+                {% if language == 'hi' %}अपनी सफलताओं को देखें और नए लक्ष्यों की ओर बढ़ें{% elif language == 'gu' %}તમારી સફળતાઓ જુઓ અને નવા લક્ષ્યો તરફ આગળ વધો{% else %}Track your progress and unlock new milestones{% endif %}
+            </p>
+        </div>
+
+        <div class="achievements-grid">
+            {% for badge in achievements %}
+            <div class="achievement-card {% if badge.id in earned_ids %}earned{% else %}locked{% endif %}">
+                <div class="card-body">
+                    <div class="achievement-icon">
+                        {% if badge.badge_image %}
+                            <img src="{{ badge.badge_image.url }}" alt="{{ badge.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        {% else %}
+                            {% if badge.id in earned_ids %}
+                                <i class="fas fa-medal"></i>
+                            {% else %}
+                                <i class="fas fa-lock"></i>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="achievement-title">{{ badge.name }}</h3>
+                    <p class="achievement-description">{{ badge.description }}</p>
+                    
+                    <span class="achievement-badge">
+                        {% if badge.id in earned_ids %}
+                            <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
+                            {% if language == 'hi' %}प्राप्त{% elif language == 'gu' %}મેળવ્યું{% else %}Earned{% endif %}
+                        {% else %}
+                            <i class="fas fa-lock" style="margin-right: 0.5rem;"></i>
+                            {% if language == 'hi' %}लॉक्ड{% elif language == 'gu' %}લૉક{% else %}Locked{% endif %}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-achievements">
+                <div class="no-achievements-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="no-achievements-text">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                        {% if language == 'hi' %}जल्द ही आएंगी उपलब्धियां!{% elif language == 'gu' %}સાધનાઓ જલ્દી આવશે!{% else %}Achievements Coming Soon!{% endif %}
+                    </h3>
+                    <p style="margin: 0;">
+                        {% if language == 'hi' %}सीखना जारी रखें और अपनी पहली उपलब्धि अर्जित करें{% elif language == 'gu' %}શીખવાનું ચાલુ રાખો અને તમારી પ્રથમ સાધના મેળવો{% else %}Keep learning to unlock your first achievement{% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.achievement-card');
+        
+        cards.forEach((card, index) => {
+            // Stagger animation entrance
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.animation = 'slideInUp 0.6s ease-out forwards';
+            
+            // Add click interaction for earned badges
+            if (card.classList.contains('earned')) {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            }
+        });
+    });
+    
+    // Add CSS animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+{% endblock %}

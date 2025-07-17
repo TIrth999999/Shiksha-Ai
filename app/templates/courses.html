@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if language == 'hi' %}कोर्सेस{% elif language == 'gu' %}કોર્સિસ{% else %}Courses{% endif %} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    
+    :root {
+        --primary-color: #3A86FF;
+        --accent-color: #FFBE0B;
+        --success-color: #06D6A0;
+        --text-dark: #2B2D42;
+        --text-light: #8D99AE;
+        --card-shadow: 0 4px 20px rgba(58, 134, 255, 0.1);
+        --card-shadow-hover: 0 8px 30px rgba(58, 134, 255, 0.2);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .courses-container {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .courses-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 0 1rem;
+    }
+
+    .courses-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(58, 134, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .courses-title i {
+        color: var(--accent-color);
+        font-size: 2.2rem;
+    }
+
+    .courses-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        font-weight: 400;
+        margin-bottom: 2rem;
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+        padding: 0 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .course-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+        position: relative;
+        border: none;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .course-card.completed {
+        background: linear-gradient(135deg, var(--success-color) 0%, #04c2a1 100%);
+        color: white;
+    }
+
+    .course-card.completed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-top: 50px solid var(--accent-color);
+        z-index: 1;
+    }
+
+    .course-card.completed::after {
+        content: '✓';
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        z-index: 2;
+    }
+
+    .course-card-header {
+        padding: 2rem 2rem 1rem;
+        text-align: center;
+    }
+
+    .course-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        transition: var(--transition);
+        background: linear-gradient(135deg, var(--primary-color) 0%, #5B9CFF 100%);
+        color: white;
+    }
+
+    .course-card.completed .course-icon {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .course-card:hover .course-icon {
+        transform: scale(1.1);
+    }
+
+    .course-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+        color: var(--text-dark);
+    }
+
+    .course-card.completed .course-title {
+        color: white;
+    }
+
+    .course-card-body {
+        padding: 0 2rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+        flex-grow: 1;
+    }
+
+    .course-card.completed .course-description {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .course-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(58, 134, 255, 0.05);
+        border-radius: 12px;
+        font-size: 0.9rem;
+    }
+
+    .course-card.completed .course-stats {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stat-item i {
+        color: var(--primary-color);
+    }
+
+    .course-card.completed .stat-item i {
+        color: white;
+    }
+
+    .course-card-footer {
+        padding: 0 2rem 2rem;
+        margin-top: auto;
+    }
+
+    .course-btn {
+        width: 100%;
+        padding: 1rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .course-btn.btn-start {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #5B9CFF 100%);
+        color: white;
+    }
+
+    .course-btn.btn-start:hover {
+        background: linear-gradient(135deg, #2968d4 0%, var(--primary-color) 100%);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .course-btn.btn-view {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .course-btn.btn-view:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .no-courses {
+        text-align: center;
+        padding: 4rem 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .no-courses-icon {
+        font-size: 4rem;
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-courses-text {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 2px dashed #e9ecef;
+    }
+
+    .floating-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .floating-book {
+        position: absolute;
+        color: var(--accent-color);
+        animation: float 8s ease-in-out infinite;
+        opacity: 0.4;
+        font-size: 2rem;
+    }
+
+    .floating-book:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
+    .floating-book:nth-child(2) { top: 25%; right: 15%; animation-delay: 3s; }
+    .floating-book:nth-child(3) { bottom: 35%; left: 20%; animation-delay: 6s; }
+    .floating-book:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 2s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-30px) rotate(10deg); }
+    }
+
+    .difficulty-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 1;
+    }
+
+    .difficulty-beginner {
+        background: #28a745;
+        color: white;
+    }
+
+    .difficulty-intermediate {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .difficulty-advanced {
+        background: #dc3545;
+        color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .courses-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .courses-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .course-card-header,
+        .course-card-body,
+        .course-card-footer {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        .course-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .courses-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 0.5rem;
+        }
+        
+        .course-card {
+            margin: 0 0.5rem;
+        }
+    }
+</style>
+
+<div class="courses-container">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-book">📚</div>
+        <div class="floating-book">🎓</div>
+        <div class="floating-book">📖</div>
+        <div class="floating-book">✏️</div>
+    </div>
+
+    <div class="container">
+        <div class="courses-header">
+            <h1 class="courses-title">
+                <i class="fas fa-graduation-cap"></i>
+                {% if language == 'hi' %}सीखने के लिए कोर्स चुनें{% elif language == 'gu' %}શીખવા માટે કોર્સ પસંદ કરો{% else %}Choose a Course to Learn{% endif %}
+            </h1>
+            <p class="courses-subtitle">
+                {% if language == 'hi' %}अपनी रुचि के अनुसार कोर्स चुनें और आज ही सीखना शुरू करें{% elif language == 'gu' %}તમારી રુચિ અનુસાર કોર્સ પસંદ કરો અને આજે જ શીખવાનું શરૂ કરો{% else %}Select courses that match your interests and start learning today{% endif %}
+            </p>
+        </div>
+
+        <div class="courses-grid">
+            {% for course in courses %}
+            <div class="course-card {% if course.id in completed_course_ids %}completed{% endif %}">
+                <!-- Difficulty Badge (optional - you can remove if not needed) -->
+                <div class="difficulty-badge difficulty-beginner">
+                    {% if language == 'hi' %}शुरुआती{% elif language == 'gu' %}શરૂઆતી{% else %}Beginner{% endif %}
+                </div>
+                
+                <div class="course-card-header">
+                    <div class="course-icon">
+                        {% if course.id in completed_course_ids %}
+                            <i class="fas fa-medal"></i>
+                        {% else %}
+                            <i class="fas fa-book-open"></i>
+                        {% endif %}
+                    </div>
+                    <h3 class="course-title">{{ course.name }}</h3>
+                </div>
+
+                <div class="course-card-body">
+                    <p class="course-description">{{ course.description }}</p>
+                    
+                    <div class="course-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span>
+                                {% if language == 'hi' %}स्व-गति{% elif language == 'gu' %}સ્વ-ગતિ{% else %}Self-paced{% endif %}
+                            </span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span>
+                                {% if language == 'hi' %}सभी स्तर{% elif language == 'gu' %}બધા સ્તર{% else %}All levels{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card-footer">
+                    <a href="{% url 'course_detail' course.id %}" class="course-btn {% if course.id in completed_course_ids %}btn-view{% else %}btn-start{% endif %}">
+                        {% if course.id in completed_course_ids %}
+                            <i class="fas fa-eye"></i>
+                            {% if language == 'hi' %}देखें{% elif language == 'gu' %}જુઓ{% else %}View{% endif %}
+                        {% else %}
+                            <i class="fas fa-play"></i>
+                            {% if language == 'hi' %}शुरू करें{% elif language == 'gu' %}શરૂ કરો{% else %}Start{% endif %}
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-courses">
+                <div class="no-courses-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="no-courses-text">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                        {% if language == 'hi' %}जल्द ही आएंगे कोर्स!{% elif language == 'gu' %}કોર્સ જલ્દી આવશે!{% else %}Courses Coming Soon!{% endif %}
+                    </h3>
+                    <p style="margin: 0;">
+                        {% if language == 'hi' %}हमारी टीम आपके लिए बेहतरीन कोर्स तैयार कर रही है{% elif language == 'gu' %}અમારી ટીમ તમારા માટે શ્રેષ્ઠ કોર્સ તૈયાર કરી રહી છે{% else %}Our team is preparing amazing courses for you{% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate course cards on page load
+        const cards = document.querySelectorAll('.course-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.15}s`;
+            card.style.animation = 'slideInUp 0.6s ease-out forwards';
+        });
+
+        // Add hover effect sounds (optional - you can remove if not needed)
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Add click animation for course cards
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.course-btn')) {
+                    const courseButton = this.querySelector('.course-btn');
+                    if (courseButton) {
+                        courseButton.click();
+                    }
+                }
+            });
+        });
+    });
+
+    // Add CSS animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .course-card {
+            opacity: 0;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+{% endblock %}

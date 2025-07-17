@@ -1,0 +1,808 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    
+    :root {
+        --primary-color: #3A86FF;
+        --accent-color: #FFBE0B;
+        --secondary-color: #F8F9FA;
+        --success-color: #10B981;
+        --info-color: #06B6D4;
+        --warning-color: #F59E0B;
+        --danger-color: #EF4444;
+        --text-primary: #2D3748;
+        --text-secondary: #4A5568;
+        --border-color: #E2E8F0;
+        --shadow-light: 0 2px 8px rgba(58, 134, 255, 0.1);
+        --shadow-medium: 0 4px 16px rgba(58, 134, 255, 0.15);
+        --shadow-strong: 0 8px 32px rgba(58, 134, 255, 0.2);
+        --border-radius: 12px;
+        --border-radius-small: 8px;
+    }
+    
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    
+    .main-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .lesson-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 30px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(10px);
+    }
+    
+    .lesson-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .lesson-title::before {
+        content: "📖";
+        font-size: 2.5rem;
+    }
+    
+    .achievement-alert {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-medium);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .achievement-alert::before {
+        content: "🏆";
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .achievement-content {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+    }
+    
+    .achievement-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    .achievement-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .lesson-content-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(10px);
+    }
+    
+    .lesson-controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+    
+    .tts-button {
+        background: var(--info-color);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .tts-button:hover {
+        background: #0891b2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-light);
+    }
+    
+    .lesson-content-card {
+        background: white;
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+    }
+    
+    .lesson-content-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+    
+    .lesson-content {
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: var(--text-primary);
+    }
+    
+    .lesson-content h1,
+    .lesson-content h2,
+    .lesson-content h3 {
+        color: var(--primary-color);
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    .lesson-content p {
+        margin-bottom: 15px;
+    }
+    
+    .lesson-content ul,
+    .lesson-content ol {
+        margin-left: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .lesson-content li {
+        margin-bottom: 8px;
+    }
+    
+    .completion-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(10px);
+        text-align: center;
+    }
+    
+    .complete-button {
+        background: var(--success-color);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .complete-button:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+    
+    .complete-button::after {
+        content: "✓";
+        font-size: 18px;
+    }
+    
+    .divider {
+        margin: 40px 0;
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    }
+    
+    .ai-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(10px);
+    }
+    
+    .ai-section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.4rem;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .ai-section-title::before {
+        content: "🤖";
+        font-size: 1.5rem;
+    }
+    
+    .ai-question-form {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        align-items: stretch;
+    }
+    
+    .ai-question-input {
+        flex: 1;
+        padding: 16px 20px;
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        font-weight: 400;
+        background: #ffffff;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+    
+    .ai-question-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .mic-button {
+        padding: 16px 18px;
+        background: var(--accent-color);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+    }
+    
+    .mic-button:hover {
+        background: #e6a800;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+    
+    .mic-button.recording {
+        background: var(--danger-color);
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .ask-ai-button {
+        padding: 16px 28px;
+        background: var(--primary-color);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .ask-ai-button:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+    
+    .ask-ai-button::after {
+        content: "→";
+        font-size: 18px;
+    }
+    
+    .ai-answer-card {
+        background: linear-gradient(135deg, #06B6D4 0%, #0891b2 100%);
+        border: none;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+    }
+    
+    .ai-answer-content {
+        padding: 25px;
+        background: rgba(255, 255, 255, 0.95);
+        margin: 2px;
+        border-radius: calc(var(--border-radius) - 2px);
+    }
+    
+    .ai-answer-header {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .ai-answer-header::before {
+        content: "🧠";
+        font-size: 1.4rem;
+    }
+    
+    .ai-answer-text {
+        color: var(--text-primary);
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .ai-answer-controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .ai-listen-button {
+        background: var(--success-color);
+        border: none;
+        border-radius: var(--border-radius-small);
+        color: white;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .ai-listen-button:hover {
+        background: #059669;
+        transform: translateY(-1px);
+    }
+    
+    .ai-stop-button {
+        background: var(--danger-color);
+        border: none;
+        border-radius: var(--border-radius-small);
+        color: white;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .ai-stop-button:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+    
+    .back-to-course {
+        background: var(--text-secondary);
+        border: none;
+        border-radius: var(--border-radius);
+        color: white;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    
+    .back-to-course:hover {
+        background: #2D3748;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-light);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .back-to-course::before {
+        content: "←";
+        font-size: 18px;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main-container {
+            padding: 0 15px;
+        }
+        
+        .lesson-title {
+            font-size: 1.8rem;
+        }
+        
+        .lesson-controls {
+            justify-content: center;
+        }
+        
+        .ai-question-form {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ai-question-input {
+            padding: 14px 16px;
+        }
+        
+        .mic-button,
+        .ask-ai-button {
+            padding: 14px 20px;
+            justify-content: center;
+        }
+        
+        .ai-answer-controls {
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .lesson-header,
+        .lesson-content-section,
+        .ai-section {
+            padding: 20px;
+        }
+        
+        .lesson-title {
+            font-size: 1.6rem;
+        }
+        
+        .lesson-content-card {
+            padding: 20px;
+        }
+        
+        .lesson-content {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="main-container">
+    <div class="lesson-header">
+        <h2 class="lesson-title">{{ lesson.title }}</h2>
+    </div>
+    
+    {% if achievement_unlocked %}
+    <div class="achievement-alert" role="alert">
+        <div class="achievement-content">
+            {% if language == 'hi' %}बधाई हो! आपने उपलब्धि अनलॉक की: {% elif language == 'gu' %}અભિનંદન! તમે સિદ્ધિ અનલોક કરી: {% else %}Congratulations! You unlocked an achievement: {% endif %}
+            <strong>{{ achievement_unlocked }}</strong>
+        </div>
+        <button type="button" class="achievement-close" data-bs-dismiss="alert" aria-label="Close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    {% endif %}
+    
+    <div class="lesson-content-section">
+        <div class="lesson-controls">
+            <button class="tts-button" id="lesson-tts-btn">
+                <i class="fas fa-volume-up"></i>
+                {% if language == 'hi' %}सुनें{% elif language == 'gu' %}સાંભળો{% else %}Listen{% endif %}
+            </button>
+        </div>
+        
+        <div class="lesson-content-card">
+            <div class="lesson-content" id="lesson-content">{{ lesson_content|safe }}</div>
+        </div>
+    </div>
+    
+    <div class="completion-section">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="complete" class="complete-button">
+                {% if language == 'hi' %}पूरा किया{% elif language == 'gu' %}પૂર્ણ કર્યું{% else %}Mark as Complete{% endif %}
+            </button>
+        </form>
+    </div>
+    
+    <hr class="divider">
+    
+    <div class="ai-section">
+        <h4 class="ai-section-title">{% if language == 'hi' %}इस पाठ के बारे में पूछें{% elif language == 'gu' %}આ પાઠ વિશે પૂછો{% else %}Ask about this lesson{% endif %}</h4>
+        
+        <form method="post" class="ai-question-form" id="ai-question-form">
+            {% csrf_token %}
+            <input type="text" 
+                   name="question" 
+                   class="ai-question-input" 
+                   lang="{% if language == 'gu' %}gu{% elif language == 'hi' %}hi{% else %}en{% endif %}" 
+                   placeholder="{% if language == 'hi' %}सवाल लिखें...{% elif language == 'gu' %}પ્રશ્ન લખો...{% else %}Type your question...{% endif %}" 
+                   autocomplete="off">
+            
+            <button type="button" 
+                    class="mic-button" 
+                    id="mic-btn" 
+                    title="{% if language == 'hi' %}माइक से बोलें{% elif language == 'gu' %}માઇકથી બોલો{% else %}Speak with mic{% endif %}">
+                <span id="mic-icon">🎤</span>
+            </button>
+            
+            <button type="submit" name="ask_ai" class="ask-ai-button">
+                {% if language == 'hi' %}पूछें{% elif language == 'gu' %}પૂછો{% else %}Ask{% endif %}
+            </button>
+        </form>
+        
+        {% if answer %}
+        <div class="ai-answer-card">
+            <div class="ai-answer-content">
+                <div class="ai-answer-header">
+                    {% if language == 'hi' %}AI उत्तर{% elif language == 'gu' %}AI જવાબ{% else %}AI Answer{% endif %}
+                </div>
+                <div class="ai-answer-text" id="ai-answer-text">{{ answer }}</div>
+                <div class="ai-answer-controls">
+                    <button class="ai-listen-button" id="tts-btn">
+                        <i class="fas fa-volume-up"></i>
+                        {% if language == 'hi' %}सुनें{% elif language == 'gu' %}સાંભળો{% else %}Listen{% endif %}
+                    </button>
+                    <button class="ai-stop-button" id="tts-stop-btn">
+                        <i class="fas fa-stop"></i>
+                        {% if language == 'hi' %}रोकें{% elif language == 'gu' %}બંધ કરો{% else %}Stop{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'course_detail' lesson.course.id %}" class="back-to-course">
+            {% if language == 'hi' %}कोर्स पर जाएं{% elif language == 'gu' %}કોર્સ પર જાઓ{% else %}Back to Course{% endif %}
+        </a>
+    </div>
+</div>
+
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// --- Speech-to-Text (mic) ---
+let micUsed = false;
+const micBtn = document.getElementById('mic-btn');
+const questionInput = document.querySelector('input[name="question"]');
+
+if (micBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    if ('{{ language }}' === 'gu') {
+        recognition.lang = 'gu-IN';
+    } else if ('{{ language }}' === 'hi') {
+        recognition.lang = 'hi-IN';
+    } else {
+        recognition.lang = 'en-US';
+    }
+    
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    
+    micBtn.addEventListener('click', function() {
+        this.classList.add('recording');
+        recognition.start();
+    });
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        questionInput.value = transcript;
+        micBtn.classList.remove('recording');
+        if (!micUsed) {
+            micUsed = true;
+            awardBadge('First Time Speaks');
+        }
+    };
+    
+    recognition.onerror = function(event) {
+        micBtn.classList.remove('recording');
+    };
+    
+    recognition.onend = function() {
+        micBtn.classList.remove('recording');
+    };
+}
+
+// --- Lesson Content TTS ---
+document.getElementById('lesson-tts-btn').addEventListener('click', function() {
+    let text = document.getElementById('lesson-content').innerText;
+    
+    function trySpeak() {
+        let voices = window.speechSynthesis.getVoices();
+        let guVoice = voices.find(v => v.lang.toLowerCase().startsWith('gu'));
+        let hiVoice = voices.find(v => v.lang.toLowerCase().startsWith('hi'));
+        let enVoice = voices.find(v => v.lang.toLowerCase().startsWith('en'));
+        
+        let utter = new SpeechSynthesisUtterance(text);
+        
+        if ('{{ language }}' === 'gu' && guVoice) {
+            utter.voice = guVoice;
+            utter.lang = guVoice.lang;
+        } else if ('{{ language }}' === 'hi' && hiVoice) {
+            utter.voice = hiVoice;
+            utter.lang = hiVoice.lang;
+        } else if (enVoice) {
+            utter.voice = enVoice;
+            utter.lang = enVoice.lang;
+        }
+        
+        utter.rate = 0.95;
+        utter.pitch = 1.1;
+        window.speechSynthesis.speak(utter);
+    }
+    
+    if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.onvoiceschanged = trySpeak;
+    } else {
+        trySpeak();
+    }
+});
+
+// --- TTS (Listen) with Gujarati fallback ---
+function speakTextWithGujaratiFallback(text) {
+    function trySpeak() {
+        let voices = window.speechSynthesis.getVoices();
+        let guVoice = voices.find(v => v.lang.toLowerCase().startsWith('gu'));
+        let hiVoice = voices.find(v => v.lang.toLowerCase().startsWith('hi'));
+        let enVoice = voices.find(v => v.lang.toLowerCase().startsWith('en'));
+        
+        let utter = new SpeechSynthesisUtterance(text);
+        
+        if (guVoice) {
+            utter.voice = guVoice;
+            utter.lang = guVoice.lang;
+            window.speechSynthesis.speak(utter);
+        } else if (hiVoice) {
+            utter.voice = hiVoice;
+            utter.lang = hiVoice.lang;
+            utter.text = 'ગુજરાતી અવાજ ઉપલબ્ધ નથી. હવે હિન્દીમાં બોલીશ: ' + text;
+            window.speechSynthesis.speak(utter);
+        } else if (enVoice) {
+            utter.voice = enVoice;
+            utter.lang = enVoice.lang;
+            utter.text = 'Gujarati/Hindi voice not available. Speaking in English: ' + text;
+            window.speechSynthesis.speak(utter);
+        } else {
+            alert('Sorry, your browser does not support Gujarati, Hindi, or English voice output.');
+        }
+    }
+    
+    if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.onvoiceschanged = trySpeak;
+    } else {
+        trySpeak();
+    }
+}
+
+let ttsUsed = false;
+const ttsBtn = document.getElementById('tts-btn');
+if (ttsBtn) {
+    ttsBtn.addEventListener('click', function() {
+        const text = document.getElementById('ai-answer-text').textContent;
+        if (!text) return;
+        
+        if ('{{ language }}' === 'gu') {
+            speakTextWithGujaratiFallback(text);
+        } else if ('{{ language }}' === 'hi') {
+            let utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'hi-IN';
+            window.speechSynthesis.speak(utter);
+        } else {
+            let utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            window.speechSynthesis.speak(utter);
+        }
+        
+        if (!ttsUsed) {
+            ttsUsed = true;
+            awardBadge('First Time Hears');
+        }
+    });
+}
+
+// --- Stop TTS ---
+const stopBtn = document.getElementById('tts-stop-btn');
+if (stopBtn) {
+    stopBtn.addEventListener('click', function() {
+        window.speechSynthesis.cancel();
+    });
+}
+
+// --- AJAX badge awarder ---
+function awardBadge(badgeName) {
+    fetch('/award-badge/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.getElementById('csrf-token').value
+        },
+        body: JSON.stringify({ badge: badgeName })
+    });
+}
+
+// Enhanced UI interactions
+// Force submit for complete button
+
+document.addEventListener('DOMContentLoaded', function() {
+    const askButton = document.querySelector('.ask-ai-button');
+    const completeButton = document.querySelector('.complete-button');
+    
+    // Add loading state to ask button
+    const aiForm = document.getElementById('ai-question-form');
+    if (aiForm) {
+        aiForm.addEventListener('submit', function() {
+            askButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            askButton.disabled = true;
+        });
+    }
+    
+    // Force submit for complete button
+    if (completeButton) {
+        completeButton.addEventListener('click', function(e) {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
+            this.disabled = true;
+            setTimeout(() => {
+                this.form.submit();
+            }, 100);
+        });
+    }
+    
+    // Auto-focus on AI question input
+    if (questionInput) {
+        questionInput.focus();
+    }
+});
+</script>
+{% endblock %}

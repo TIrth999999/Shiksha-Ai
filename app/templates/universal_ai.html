@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{% if language == 'hi' %}पूछें{% elif language == 'gu' %}પૂછો{% else %}Universal AI{% endif %} | ShikshaAI{% endblock %}
+{% block content %}
+<h2 class="mb-4">{% if language == 'hi' %}कोई भी सवाल पूछें{% elif language == 'gu' %}કોઈ પણ પ્રશ્ન પૂછો{% else %}Ask Anything!{% endif %}</h2>
+<form method="post" class="input-group mb-3">
+    {% csrf_token %}
+    <input type="text" name="question" class="form-control form-control-lg" lang="{% if language == 'gu' %}gu{% elif language == 'hi' %}hi{% else %}en{% endif %}" placeholder="{% if language == 'hi' %}यहाँ लिखें...{% elif language == 'gu' %}અહીં લખો...{% else %}Type here...{% endif %}" autocomplete="off" value="{{ question|default:'' }}" required>
+    <button type="submit" class="btn btn-primary btn-lg">{% if language == 'hi' %}पूछें{% elif language == 'gu' %}પૂછો{% else %}Ask{% endif %}</button>
+</form>
+{% if answer %}
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">{% if language == 'hi' %}उत्तर{% elif language == 'gu' %}જવાબ{% else %}Answer{% endif %}</h5>
+        <p class="card-text">{{ answer }}</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

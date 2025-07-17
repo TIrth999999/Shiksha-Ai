@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if language == 'hi' %}डैशबोर्ड{% elif language == 'gu' %}ડેશબોર્ડ{% else %}Dashboard{% endif %} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+  }
+  
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .hero-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(58, 134, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+    z-index: 0;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.1); opacity: 0.1; }
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #3A86FF, #FFBE0B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .hero-title i {
+    color: #3A86FF;
+    -webkit-text-fill-color: #3A86FF;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .feature-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(58, 134, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3A86FF, #FFBE0B);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .feature-card:hover::before {
+    transform: translateX(0);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    display: block;
+  }
+  
+  .feature-text {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+  }
+  
+  .cta-section {
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(45deg, #3A86FF, #FFBE0B);
+    color: white;
+    padding: 18px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(58, 134, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .cta-button:hover::before {
+    left: 100%;
+  }
+  
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(58, 134, 255, 0.4);
+  }
+  
+  .cta-button i {
+    font-size: 1.2rem;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 15px;
+    }
+    
+    .hero-section {
+      padding: 30px 20px;
+      margin-bottom: 20px;
+    }
+    
+    .hero-title {
+      font-size: 2rem;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .hero-description {
+      font-size: 1rem;
+    }
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    
+    .feature-card {
+      padding: 20px;
+    }
+    
+    .cta-button {
+      padding: 15px 30px;
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .hero-description {
+      font-size: 0.95rem;
+    }
+    
+    .feature-card {
+      padding: 18px;
+    }
+    
+    .feature-icon {
+      font-size: 2rem;
+    }
+    
+    .cta-button {
+      padding: 14px 25px;
+      font-size: 0.95rem;
+    }
+  }
+  
+  /* Animation for page load */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .hero-section, .feature-card {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  .feature-card:nth-child(1) { animation-delay: 0.1s; }
+  .feature-card:nth-child(2) { animation-delay: 0.2s; }
+  .feature-card:nth-child(3) { animation-delay: 0.3s; }
+  .feature-card:nth-child(4) { animation-delay: 0.4s; }
+  .feature-card:nth-child(5) { animation-delay: 0.5s; }
+</style>
+
+<div class="dashboard-container">
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <i class="fas fa-graduation-cap"></i>
+        {% if language == 'hi' %}शिक्षाAI में आपका स्वागत है!{% elif language == 'gu' %}શિક્ષાAI માં આપનું સ્વાગત છે!{% else %}Welcome to ShikshaAI!{% endif %}
+      </h1>
+      
+      <p class="hero-description">
+        {% if language == 'hi' %}
+          शिक्षाAI बच्चों और वयस्कों के लिए एक स्मार्ट, बहुभाषी, AI-सहायता प्राप्त शिक्षा मंच है।
+        {% elif language == 'gu' %}
+          શિક્ષાAI બાળકો અને પુખ્ત વયના લોકો માટે એક સ્માર્ટ, બહુભાષી, AI આધારિત શિક્ષણ પ્લેટફોર્મ છે.
+        {% else %}
+          ShikshaAI is a smart, multilingual, AI-powered education platform for children and adults.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <div class="feature-text">
+        {% if language == 'hi' %}प्राथमिक शिक्षा के सभी विषय: वर्णमाला, संख्याएँ, गणित, विज्ञान, नैतिक कहानियाँ, और बहुत कुछ।{% elif language == 'gu' %}પ્રાથમિક શિક્ષણના બધા વિષયો: અક્ષરો, સંખ્યાઓ, ગણિત, વિજ્ઞાન, નૈતિક વાર્તાઓ અને વધુ.{% else %}All primary education topics: alphabets, numbers, math, science, moral stories, and more.{% endif %}
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <div class="feature-text">
+        {% if language == 'hi' %}अचीवमेंट्स और बैज: सीखने पर पुरस्कार पाएं!{% elif language == 'gu' %}અચિવમેન્ટ્સ અને બેજ: શીખવા પર ઇનામ મેળવો!{% else %}Achievements & badges: Get rewards for learning!{% endif %}
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <div class="feature-text">
+        {% if language == 'hi' %}अंग्रेज़ी, हिंदी, गुजराती में सीखें।{% elif language == 'gu' %}અંગ્રેજી, હિન્દી, ગુજરાતી ભાષામાં શીખો.{% else %}Learn in English, Hindi, or Gujarati.{% endif %}
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🎤</div>
+      <div class="feature-text">
+        {% if language == 'hi' %}माइक से सवाल पूछें और उत्तर सुनें।{% elif language == 'gu' %}માઇકથી પ્રશ્ન પૂછો અને જવાબ સાંભળો.{% else %}Ask questions by mic and listen to answers.{% endif %}
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-text">
+        {% if language == 'hi' %}AI आपकी हर स्थिति में मदद कर सकता है—चाहे आपको कुछ समझना हो, सीखना हो, या कोई समस्या हल करनी हो।{% elif language == 'gu' %}AI તમારી દરેક પરિસ્થિતિમાં મદદ કરી શકે છે—શુંક સમજવું હોય, શીખવું હોય, કે સમસ્યા ઉકેલવી હોય.{% else %}AI can help you in any situation—whether you want to learn, understand, or solve a problem.{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <a href="#" class="cta-button">
+      <i class="fas fa-play"></i>
+      {% if language == 'hi' %}सीखना शुरू करें{% elif language == 'gu' %}શીખવાનું શરૂ કરો{% else %}Start Learning{% endif %}
+    </a>
+  </div>
+</div>
+
+{% endblock %}

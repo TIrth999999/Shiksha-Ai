@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if language == 'hi' %}प्रोफ़ाइल{% elif language == 'gu' %}પ્રોફાઇલ{% else %}Profile{% endif %} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+        --primary-color: #3A86FF;
+        --accent-color: #FFBE0B;
+        --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 8px 32px rgba(58, 134, 255, 0.1);
+        --text-dark: #2c3e50;
+        --text-light: #6c757d;
+        --border-radius: 16px;
+        --success-color: #10b981;
+    }
+    
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    
+    .settings-container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .settings-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .settings-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(58, 134, 255, 0.15);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-color), #5a9cff);
+        color: white;
+        padding: 24px 32px;
+        text-align: center;
+        border: none;
+    }
+    
+    .settings-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+    
+    .settings-icon {
+        font-size: 1.6rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .card-body {
+        padding: 32px;
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+    }
+    
+    .language-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 1rem;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        color: var(--text-dark);
+    }
+    
+    .language-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        background-color: white;
+    }
+    
+    .language-select:hover {
+        border-color: var(--primary-color);
+        background-color: white;
+    }
+    
+    .save-button {
+        width: 100%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, var(--primary-color), #5a9cff);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+    
+    .save-button:hover {
+        background: linear-gradient(135deg, #2a76ef, #4a8cff);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(58, 134, 255, 0.4);
+    }
+    
+    .save-button:active {
+        transform: translateY(0);
+    }
+    
+    .current-language {
+        background: linear-gradient(135deg, var(--accent-color), #ffd93d);
+        color: #2c3e50;
+        padding: 12px 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-top: 20px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(255, 190, 11, 0.2);
+    }
+    
+    .current-language small {
+        font-size: 0.9rem;
+        display: block;
+    }
+    
+    .current-language strong {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .settings-container {
+            padding: 0 15px;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+        }
+        
+        .settings-title {
+            font-size: 1.5rem;
+        }
+        
+        .language-select {
+            padding: 12px 14px;
+        }
+        
+        .save-button {
+            padding: 12px 20px;
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .settings-container {
+            padding: 0 10px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-header {
+            padding: 18px 20px;
+        }
+        
+        .settings-title {
+            font-size: 1.3rem;
+        }
+    }
+    
+    /* Animation for page load */
+    .settings-card {
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="settings-container">
+    <div class="settings-card">
+        <div class="card-header">
+            <h2 class="settings-title">
+                <span class="settings-icon">⚙️</span>
+                {% if language == 'hi' %}सेटिंग्स{% elif language == 'gu' %}સેટિંગ્સ{% else %}Settings{% endif %}
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="language" class="form-label">
+                        🌐 {% if language == 'hi' %}भाषा चुनें{% elif language == 'gu' %}ભાષા પસંદ કરો{% else %}Select Language{% endif %}
+                    </label>
+                    <select name="language" id="language" class="language-select">
+                        {% for code, name in languages.items %}
+                            <option value="{{ code }}" {% if code == language %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="save-button">
+                    💾 {% if language == 'hi' %}सेव करें{% elif language == 'gu' %}સેવ કરો{% else %}Save{% endif %}
+                </button>
+            </form>
+            
+            <div class="current-language">
+                {% for code, name in languages.items %}
+                    {% if code == language %}
+                        <small>
+                            ✅ {% if language == 'hi' %}आपकी चुनी हुई भाषा:{% elif language == 'gu' %}તમારી પસંદ કરેલી ભાષા:{% else %}Your selected language:{% endif %}
+                        </small>
+                        <strong>{{ name }}</strong>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

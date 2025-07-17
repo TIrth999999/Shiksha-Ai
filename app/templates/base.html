@@ -1,0 +1,400 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ language|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShikshaAI{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="any" href="{% static 'logo.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    
+    <style>
+        :root {
+            --primary-color: #3A86FF;
+            --accent-color: #FFBE0B;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-light: #F8FAFC;
+            --bg-white: #FFFFFF;
+            --shadow-light: 0 2px 10px rgba(58, 134, 255, 0.1);
+            --shadow-medium: 0 4px 20px rgba(58, 134, 255, 0.15);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #E3F2FD 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: var(--bg-white) !important;
+            box-shadow: var(--shadow-light);
+            border-bottom: 1px solid rgba(58, 134, 255, 0.1);
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700 !important;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            transition: var(--transition);
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-brand img {
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(58, 134, 255, 0.2);
+        }
+
+        .navbar-brand:hover img {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
+            margin: 0 0.25rem;
+        }
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--primary-color), #4A90E2);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* .nav-link:before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        } */
+
+        .nav-link:hover:before {
+            width: 80%;
+        }
+
+        /* User info styling */
+        .navbar-nav .nav-link:first-child {
+            background: linear-gradient(135deg, var(--accent-color), #FFD700);
+            color: var(--text-dark) !important;
+            border-radius: 25px;
+            padding: 0.5rem 1rem !important;
+            font-weight: 600;
+            box-shadow: var(--shadow-light);
+        }
+
+        .navbar-nav .nav-link:first-child:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Logout button styling */
+        .btn-link {
+            color: var(--text-light) !important;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-link:hover {
+            background: #FF6B6B;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        /* Container improvements */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Card-based layout for content */
+        .content-card {
+            background: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            border: 1px solid rgba(58, 134, 255, 0.1);
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Enhanced buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #4A90E2);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover:before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-color), #FFD700);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            color: var(--text-dark);
+        }
+
+        /* Form improvements */
+        .form-control {
+            border-radius: var(--border-radius);
+            border: 2px solid rgba(58, 134, 255, 0.1);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--bg-white);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .content-card {
+                padding: 1.5rem;
+            }
+            
+            .btn-primary, .btn-accent {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Navbar toggler improvements */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            background: rgba(58, 134, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .navbar-toggler:hover {
+            background: rgba(58, 134, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.2rem rgba(58, 134, 255, 0.25);
+        }
+
+        /* Animation for page load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Icon enhancements */
+        .nav-link i {
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Utility classes */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .bg-gradient {
+            background: linear-gradient(135deg, var(--primary-color), #4A90E2);
+        }
+
+        .shadow-custom {
+            box-shadow: var(--shadow-medium);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="/dashboard/">
+                <img src="{% static 'logo.png' %}" alt="ShikshaAI Logo" width="48" height="48" class="me-2">
+                <span>
+                    {% if language == 'hi' %}शिक्षाAI{% elif language == 'gu' %}શિક્ષાAI{% else %}ShikshaAI{% endif %}
+                </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses/">
+                            <i class="fas fa-book"></i>
+                            {% if language == 'hi' %}कोर्सेस{% elif language == 'gu' %}કોર્સિસ{% else %}Courses{% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/achievements/">
+                            <i class="fas fa-trophy"></i>
+                            {% if language == 'hi' %}उपलब्धियां{% elif language == 'gu' %}સાધનાઓ{% else %}Achievements{% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/learn/">
+                            <i class="fas fa-robot"></i>
+                            {% if language == 'hi' %}सीखें{% elif language == 'gu' %}શીખો{% else %}Learn{% endif %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/">
+                            <i class="fas fa-user"></i>
+                            {% if language == 'hi' %}प्रोफ़ाइल{% elif language == 'gu' %}પ્રોફાઇલ{% else %}Profile{% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <i class="fas fa-user-circle"></i>
+                                {{ user.username }}
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="/logout/" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link btn btn-link" style="display:inline; padding:0; border:none; background:none;">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    {% if language == 'hi' %}लॉगआउट{% elif language == 'gu' %}લૉગઆઉટ{% else %}Logout{% endif %}
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login/">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signup/">
+                                <i class="fas fa-user-plus"></i>
+                                Sign Up
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.name }} | ShikshaAI{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    
+    :root {
+        --primary-color: #3A86FF;
+        --accent-color: #FFBE0B;
+        --success-color: #06D6A0;
+        --text-dark: #2B2D42;
+        --text-light: #8D99AE;
+        --card-shadow: 0 4px 20px rgba(58, 134, 255, 0.1);
+        --card-shadow-hover: 0 8px 30px rgba(58, 134, 255, 0.2);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .course-container {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .course-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #5B9CFF 100%);
+        border-radius: var(--border-radius);
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        color: white;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    .course-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .course-title i {
+        font-size: 2rem;
+        color: var(--accent-color);
+    }
+
+    .course-description {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    .lessons-section {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .lessons-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--primary-color);
+    }
+
+    .lessons-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .lessons-count {
+        background: var(--accent-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .lessons-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .lesson-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+        border: none;
+        position: relative;
+    }
+
+    .lesson-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .lesson-card.completed {
+        background: linear-gradient(135deg, var(--success-color) 0%, #04c2a1 100%);
+        color: white;
+    }
+
+    .lesson-card.completed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-top: 50px solid var(--accent-color);
+        z-index: 1;
+    }
+
+    .lesson-card.completed::after {
+        content: '✓';
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        z-index: 2;
+    }
+
+    .lesson-content {
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .lesson-info {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .lesson-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .lesson-card.completed .lesson-icon {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lesson-text {
+        flex: 1;
+    }
+
+    .lesson-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--text-dark);
+    }
+
+    .lesson-card.completed .lesson-title {
+        color: white;
+    }
+
+    .lesson-status {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .lesson-action {
+        flex-shrink: 0;
+    }
+
+    .btn-learn {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #5B9CFF 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-learn:hover {
+        background: linear-gradient(135deg, #2968d4 0%, var(--primary-color) 100%);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-completed {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: not-allowed;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .no-lessons {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 2px dashed #e9ecef;
+    }
+
+    .no-lessons-icon {
+        font-size: 4rem;
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-lessons-text {
+        font-size: 1.1rem;
+        color: var(--text-light);
+    }
+
+    .back-section {
+        text-align: center;
+        margin-top: 3rem;
+        padding: 2rem;
+    }
+
+    .btn-back {
+        background: var(--text-light);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-back:hover {
+        background: var(--text-dark);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .progress-bar {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .progress-fill {
+        height: 8px;
+        background: var(--accent-color);
+        transition: width 0.5s ease;
+    }
+
+    .progress-text {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .course-title {
+            font-size: 2rem;
+        }
+        
+        .course-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .lesson-content {
+            padding: 1.5rem;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        
+        .lesson-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .lesson-action {
+            align-self: stretch;
+        }
+        
+        .btn-learn, .btn-completed {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .course-title {
+            font-size: 1.8rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .lessons-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<div class="course-container">
+    <div class="container">
+        <!-- Course Header -->
+        <div class="course-header">
+            <h1 class="course-title">
+                <i class="fas fa-graduation-cap"></i>
+                {{ course.name }}
+            </h1>
+            <p class="course-description">{{ course.description }}</p>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" data-completed="{{ completed_ids|length }}" data-total="{{ lessons|length }}"></div>
+            </div>
+            <div class="progress-text">
+                {% if lessons %}
+                    {% if language == 'hi' %}
+                        {{ completed_ids|length }} में से {{ lessons|length }} पाठ पूरे हुए
+                    {% elif language == 'gu' %}
+                        {{ lessons|length }} માંથી {{ completed_ids|length }} પાઠ પૂર્ણ થયા
+                    {% else %}
+                        {{ completed_ids|length }} of {{ lessons|length }} lessons completed
+                    {% endif %}
+                {% else %}
+                    {% if language == 'hi' %}कोई पाठ उपलब्ध नहीं{% elif language == 'gu' %}કોઈ પાઠ ઉપલબ્ધ નથી{% else %}No lessons available{% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Lessons Section -->
+        <div class="lessons-section">
+            <div class="lessons-header">
+                <h2 class="lessons-title">
+                    <i class="fas fa-book-open" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                    {% if language == 'hi' %}पाठ{% elif language == 'gu' %}પાઠો{% else %}Lessons{% endif %}
+                </h2>
+                {% if lessons %}
+                <div class="lessons-count">{{ lessons|length }}</div>
+                {% endif %}
+            </div>
+
+            <div class="lessons-grid">
+                {% for lesson in lessons %}
+                <div class="lesson-card {% if lesson.id in completed_ids %}completed{% endif %}">
+                    <div class="lesson-content">
+                        <div class="lesson-info">
+                            <div class="lesson-icon">
+                                {% if lesson.id in completed_ids %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-play-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="lesson-text">
+                                <div class="lesson-title">{{ lesson.title }}</div>
+                                <div class="lesson-status">
+                                    {% if lesson.id in completed_ids %}
+                                        <i class="fas fa-medal"></i>
+                                        {% if language == 'hi' %}पूरा हुआ{% elif language == 'gu' %}પૂર્ણ થયું{% else %}Completed{% endif %}
+                                    {% else %}
+                                        <i class="fas fa-clock"></i>
+                                        {% if language == 'hi' %}शुरू करें{% elif language == 'gu' %}શરૂ કરો{% else %}Ready to start{% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lesson-action">
+                            {% if lesson.id in completed_ids %}
+                                <button class="btn-completed" disabled>
+                                    <i class="fas fa-check"></i>
+                                    {% if language == 'hi' %}पूरा हुआ{% elif language == 'gu' %}પૂર્ણ થયું{% else %}Completed{% endif %}
+                                </button>
+                            {% else %}
+                                <a href="{% url 'lesson_detail' lesson.id %}" class="btn-learn">
+                                    <i class="fas fa-play"></i>
+                                    {% if language == 'hi' %}सीखें{% elif language == 'gu' %}શીખો{% else %}Learn{% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-lessons">
+                    <div class="no-lessons-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="no-lessons-text">
+                        <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                            {% if language == 'hi' %}जल्द ही आएंगे पाठ!{% elif language == 'gu' %}પાઠ જલ્દી આવશે!{% else %}Lessons Coming Soon!{% endif %}
+                        </h3>
+                        <p style="margin: 0;">
+                            {% if language == 'hi' %}इस कोर्स के लिए पाठ तैयार किए जा रहे हैं{% elif language == 'gu' %}આ કોર્સ માટે પાઠ તૈયાર કરવામાં આવી રહ્યા છે{% else %}Lessons for this course are being prepared{% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="back-section">
+            <a href="{% url 'courses' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                {% if language == 'hi' %}वापस जाएं{% elif language == 'gu' %}પાછા જાઓ{% else %}Back to Courses{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate lesson cards on page load
+        const cards = document.querySelectorAll('.lesson-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.animation = 'slideInUp 0.6s ease-out forwards';
+        });
+
+        // Add click animation for lesson cards
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.lesson-action')) {
+                    const learnButton = this.querySelector('.btn-learn');
+                    if (learnButton) {
+                        learnButton.click();
+                    }
+                }
+            });
+        });
+
+        // Animate progress bar
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            const completed = parseInt(progressFill.dataset.completed) || 0;
+            const total = parseInt(progressFill.dataset.total) || 0;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            
+            progressFill.style.width = '0%';
+            setTimeout(() => {
+                progressFill.style.width = percentage + '%';
+            }, 500);
+        }
+    });
+
+    // Add CSS animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
+{% endblock %}
