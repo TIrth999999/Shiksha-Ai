@@ -773,8 +773,6 @@ function awardBadge(badgeName) {
 }
 
 // Enhanced UI interactions
-// Force submit for complete button
-
 document.addEventListener('DOMContentLoaded', function() {
     const askButton = document.querySelector('.ask-ai-button');
     const completeButton = document.querySelector('.complete-button');
@@ -788,14 +786,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Force submit for complete button
+    // Add loading state to complete button
     if (completeButton) {
-        completeButton.addEventListener('click', function(e) {
+        completeButton.addEventListener('click', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
             this.disabled = true;
-            setTimeout(() => {
-                this.form.submit();
-            }, 100);
         });
     }
     

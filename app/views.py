@@ -169,36 +169,60 @@ def lesson_detail(request, lesson_id):
     lesson = get_object_or_404(Lesson, id=lesson_id)
     course = lesson.course
     answer = None
-    user = request.user
+    user = request.user if request.user.is_authenticated else None
+    session_key = request.session.session_key or request.session.save() or request.session.session_key
     lessons = list(course.lessons.all())
     idx = lessons.index(lesson)
-    prev_lesson = lessons[idx-1] if idx > 0 else None
+    if idx > 0:
+        prev_lesson = lessons[idx-1]
+        prev_completed = UserProgress.objects.filter(
+            user=user, session_key=None, lesson=prev_lesson, completed=True
+        ).exists()
+        if not user:
+            prev_completed = UserProgress.objects.filter(
+                user=None, session_key=session_key, lesson=prev_lesson, completed=True
+            ).exists()
+        if not prev_completed:
+            return redirect('lesson_detail', lesson_id=prev_lesson.id)
+    else:
+        prev_lesson = None
     next_lesson = lessons[idx+1] if idx+1 < len(lessons) else None
     achievement_unlocked = None
-
     if request.method == 'POST':
         if 'complete' in request.POST:
-            up, created = UserProgress.objects.get_or_create(user=user, lesson=lesson)
-            up.completed = True
-            up.save()
-            # Check for course completion
+            up, created = UserProgress.objects.get_or_create(
+                user=user, session_key=None if user else session_key, lesson=lesson,
+                defaults={'completed': True, 'timestamp': timezone.now()}
+            )
+            if created:
+                up.completed = True
+                up.save()
             total = course.lessons.count()
-            done = UserProgress.objects.filter(user=user, lesson__course=course, completed=True).count()
+            done = UserProgress.objects.filter(
+                user=user, session_key=None if user else session_key, lesson__course=course, completed=True
+            ).count()
             if total == done:
                 ach = Achievement.objects.filter(name__icontains='Course Finisher').first()
-                if ach and not UserAchievement.objects.filter(user=user, achievement=ach).exists():
-                    UserAchievement.objects.create(user=user, achievement=ach)
-                    achievement_unlocked = ach.name
+                print(f'Checking Course Finisher achievement for user={user}, session={session_key}, ach={ach}')
+                if ach:
+                    ua, created = UserAchievement.objects.get_or_create(user=user, session_key=None if user else session_key, achievement=ach)
+                    print(f'Course Finisher achievement created={created}')
+                    if created:
+                        request.session['achievement_unlocked'] = ach.name
         elif 'ask_ai' in request.POST:
             question = request.POST.get('question')
             if question:
                 answer = get_gemini_answer(question, lang)
-                # Award 'First Time Asks' achievement
-                ach = Achievement.objects.filter(name__icontains='First Question').first()
-                if ach and not UserAchievement.objects.filter(user=user, achievement=ach).exists():
-                    UserAchievement.objects.create(user=user, achievement=ach)
-                    achievement_unlocked = ach.name
-    # Check for achievement unlocked in session (if needed)
+                ach = Achievement.objects.filter(name__icontains='First Time Asks').first()
+                print(f'Checking First Time Asks achievement for user={user}, session={session_key}, ach={ach}')
+                if ach and not UserAchievement.objects.filter(user=user, session_key=None if user else session_key, achievement=ach).exists():
+                    UserAchievement.objects.create(user=user, session_key=None if user else session_key, achievement=ach)
+                    print('First Time Asks achievement created')
+                    request.session['achievement_unlocked'] = ach.name
+    # Check for achievement unlocked in session
+    if 'achievement_unlocked' in request.session:
+        achievement_unlocked = request.session['achievement_unlocked']
+        del request.session['achievement_unlocked']
     lesson_content = get_lesson_content(lesson, lang)
     return render(request, 'lesson_detail.html', {
         'lesson': lesson,

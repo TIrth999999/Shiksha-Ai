@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-7258zc4kbrqzgda-1iv%#%hxb6nia$nfp@k58cza1ai4ypy9!5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -80,13 +80,14 @@ DATABASES = {
         'USER': 'avnadmin',
         'PASSWORD': 'AVNS_95miWNvGnB5e2MsJbQV',
         'HOST': 'shikshaai-shikshaai.e.aivencloud.com',
-        'PORT': '22943',  # usually 10000+ from Aiven
+        'PORT': '22943',
         'OPTIONS': {
-            'ssl': 'REQUIRED',  # use Aiven’s SSL cert
+            'ssl': {
+                'ssl-mode': 'REQUIRED',
+            },
         },
     }
 }
-
 
 
 # Password validation
@@ -125,7 +126,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -140,6 +140,3 @@ LANGUAGES = [
 LOCALE_PATHS = [BASE_DIR / 'locale']
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/'
-
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
