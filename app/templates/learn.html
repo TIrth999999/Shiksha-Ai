@@ -481,13 +481,6 @@ document.addEventListener('DOMContentLoaded', function() {
         askButton.disabled = true;
     });
     
-    // Enhance mic button feedback
-    if (micBtn) {
-        micBtn.addEventListener('click', function() {
-            this.classList.toggle('recording');
-        });
-    }
-    
     // Auto-focus on input
     if (questionInput) {
         questionInput.focus();
